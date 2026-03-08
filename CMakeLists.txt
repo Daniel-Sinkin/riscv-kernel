@@ -33,6 +33,23 @@ target_compile_options(kernel PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:-Wall>
     $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
     $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wshadow>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wconversion>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wfloat-conversion>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wsign-conversion>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wcast-qual>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wformat=2>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wundef>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wnull-dereference>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wnon-virtual-dtor>
+    $<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wzero-as-null-pointer-constant>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wdouble-promotion>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wimplicit-fallthrough>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wreturn-type>
 )
 
 target_link_options(kernel PRIVATE
