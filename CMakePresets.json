@@ -1,0 +1,37 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "riscv64-debug",
+      "displayName": "RISC-V Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/riscv64-debug",
+      "toolchainFile": "${sourceDir}/cmake/riscv64-toolchain.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_MAKE_PROGRAM": "/opt/homebrew/bin/ninja"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "kernel",
+      "configurePreset": "riscv64-debug",
+      "targets": [
+        "kernel"
+      ]
+    },
+    {
+      "name": "run",
+      "configurePreset": "riscv64-debug",
+      "targets": [
+        "run"
+      ]
+    }
+  ]
+}
