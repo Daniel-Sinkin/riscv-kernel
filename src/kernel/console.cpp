@@ -11,6 +11,14 @@ auto putc(char c) -> void {
     qemu_virt::write_uart_transmit(static_cast<u8>(c));
 }
 
+auto putc(u8 value) -> void {
+    putc(static_cast<char>(value));
+}
+
+auto putc(std::byte value) -> void {
+    putc(std::to_integer<u8>(value));
+}
+
 auto puts(const char *c) -> void {
     while (*c != '\0') {
         putc(*c);
@@ -30,4 +38,4 @@ auto write(const char *c, usize n) -> void {
     }
 }
 
-}  // namespace kernel
+} // namespace kernel

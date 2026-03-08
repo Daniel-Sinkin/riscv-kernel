@@ -7,6 +7,8 @@
 namespace kernel {
 
 auto putc(char c) -> void;
+auto putc(u8 value) -> void;
+auto putc(std::byte value) -> void;
 auto puts(const char *c) -> void;
 auto putsln(const char *c) -> void;
 auto write(const char *c, usize n) -> void;
@@ -25,4 +27,14 @@ inline auto write_hex(U x) -> void {
     }
 }
 
-}  // namespace kernel
+template <std::unsigned_integral U>
+inline auto write_bits(U x) -> void {
+    putc('0');
+    putc('b');
+    for (auto i = static_cast<int>(sizeof(U) * 8 - 1); i >= 0; --i) {
+        const auto bit = static_cast<u8>((x >> i) & 0x01);
+        putc(static_cast<char>('0' + bit));
+    }
+}
+
+} // namespace kernel
