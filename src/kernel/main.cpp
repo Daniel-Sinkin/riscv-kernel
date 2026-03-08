@@ -35,7 +35,16 @@ enum class UartRegister : usize {
     modem_status_register = 0x06,
     scratch_register = 0x07,
 };
-;
+enum class UartLineStatus : u8 {
+    data_ready = 1u << 0,
+    overrun_error = 1u << 1,
+    parity_error = 1u << 2,
+    framing_error = 1u << 3,
+    break_interrupt = 1u << 4,
+    transmitter_holding_register_empty = 1u << 5,
+    transmitter_empty = 1u << 6,
+    fifo_error = 1u << 7,
+};
 
 constexpr u32 k_syscon_poweroff{0x5555};
 constexpr u32 k_syscon_reboot{0x7777};
@@ -45,22 +54,59 @@ inline auto mmio_write(uptr addr, T value) -> void {
     *reinterpret_cast<volatile T *>(addr) = value;
 }
 
+inline auto mmio_read8(uptr addr) -> u8 {
+    return *reinterpret_cast<volatile u8 *>(addr);
+}
+
 inline auto syscon_poweroff() -> void {
     mmio_write(k_syscon_base, k_syscon_poweroff);
 }
 inline auto syscon_reboot() -> void {
     mmio_write(k_syscon_base, k_syscon_reboot);
 }
-inline auto write_uart(UartRegister uart_reg, char value) {
+inline auto read_uart(UartRegister uart_reg) -> u8 {
+    return mmio_read8(k_uart_base + std::to_underlying(uart_reg));
+}
+inline auto write_uart(UartRegister uart_reg, u8 value) -> void {
     mmio_write(k_uart_base + std::to_underlying(uart_reg), value);
 }
-inline auto putc(char value) {
+inline auto write_uart_transmit(u8 value) -> void {
+    const auto ready_flag = std::to_underlying(UartLineStatus::transmitter_holding_register_empty);
+    const auto lsr = UartRegister::line_status_register;
+    while ((read_uart(lsr) & ready_flag) == 0) {
+    }
     write_uart(UartRegister::transmitter_holding_register, value);
+}
+inline auto putc(char c) {
+    if (c == '\n') {
+        write_uart_transmit(static_cast<u8>('\r'));
+    }
+    write_uart_transmit(static_cast<u8>(c));
+}
+inline auto puts(const char *c) -> void {
+    while (*c != '\0') {
+        putc(*c);
+        ++c;
+    }
+    putc('\n');
+}
+inline auto write(const char *c, usize n) -> void {
+    while (n-- > 0) {
+        putc(*c);
+        ++c;
+    }
+}
+[[noreturn]] inline auto panic(const char *msg) -> void {
+    puts(msg);
+    while (true) {
+        syscon_poweroff();
+        asm volatile("wfi");
+    }
 }
 
 extern "C" [[noreturn]] void kernel_main() {
-    putc('A');
-    syscon_poweroff();
+    puts("Hello!");
+    panic("Finished Running");
 
     while (true) {
         asm volatile("wfi");
