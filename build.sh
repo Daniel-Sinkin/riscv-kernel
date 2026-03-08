@@ -5,6 +5,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${BUILD_DIR:-${ROOT_DIR}/build/riscv64-debug}"
 ACTION="${1:-build}"
+RISCV_ARCH="${RISCV_ARCH:-rv64imac_zicsr}"
+RISCV_ABI="${RISCV_ABI:-lp64}"
 
 find_program() {
     local candidate
@@ -54,6 +56,8 @@ usage: ./build.sh [build|run|configure]
 
 optional environment variables:
   RISCV_TOOLCHAIN_PREFIX   e.g. riscv64-unknown-elf or /opt/homebrew/bin/riscv64-unknown-elf
+  RISCV_ARCH               defaults to rv64imac_zicsr
+  RISCV_ABI                defaults to lp64
   BUILD_DIR                alternate build directory
 EOF
 }
@@ -92,6 +96,8 @@ CONFIGURE_ARGS=(
     "-DCMAKE_MAKE_PROGRAM=${NINJA_BIN}"
     "-DCMAKE_TOOLCHAIN_FILE=${ROOT_DIR}/cmake/riscv64-toolchain.cmake"
     "-DRISCV_TOOLCHAIN_PREFIX=${TOOLCHAIN_PREFIX}"
+    "-DRISCV_ARCH=${RISCV_ARCH}"
+    "-DRISCV_ABI=${RISCV_ABI}"
 )
 
 echo "Configuring with toolchain prefix: ${TOOLCHAIN_PREFIX}"

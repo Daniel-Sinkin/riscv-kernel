@@ -9,15 +9,24 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_program(QEMU_SYSTEM_RISCV64 qemu-system-riscv64 REQUIRED)
 
-set(RISCV_ARCH "rv64imac" CACHE STRING "RISC-V ISA string passed to GCC")
+set(RISCV_ARCH "rv64imac_zicsr" CACHE STRING "RISC-V ISA string passed to GCC")
 set(RISCV_ABI "lp64" CACHE STRING "RISC-V ABI passed to GCC")
 
 add_executable(kernel
-    src/start.S
+    src/boot/start.S
+    src/qemu_virt/syscon.cpp
+    src/qemu_virt/uart.cpp
+    src/kernel/console.cpp
+    src/kernel/panic.cpp
+    src/riscv/trap.cpp
     src/kernel/main.cpp
 )
 
 set_target_properties(kernel PROPERTIES SUFFIX ".elf")
+
+target_include_directories(kernel PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
 
 target_compile_options(kernel PRIVATE
     -march=${RISCV_ARCH}

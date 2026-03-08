@@ -35,6 +35,9 @@ SECTIONS
     . += 64K;
     __stack_top = .;
 
+    . = ALIGN(4K);
+    _kernel_end = .;
+
     /DISCARD/ :
     {
         *(.comment)

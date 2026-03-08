@@ -5,11 +5,11 @@
 # This puts the following emitted code into the section named .text.init
 .section .text.init 
 
+
 # Makes _start globally visible, b.c. of ENTRY(_start) this is the entry point
 .globl _start
 # Declares that _start is a function symbol
 .type _start, @function
-
 # Begin of _start function
 _start:
     # .option is assembler directive for changing assembler option
@@ -29,6 +29,10 @@ _start:
     # __stack_top = Linker-defined symbol pointing
     #               to the start (i.e. top) of the stack
     la sp, __stack_top
+
+    la t0, trap_entry
+    csrw mtvec, t0
+
     # Calls into the kernel_main function in the main.cpp
     call kernel_main
 
@@ -43,3 +47,17 @@ _start:
 # symbol_size(_start) = current_address - address(_start)
 .size _start, . - _start
 # End of _start function
+
+.globl trap_entry
+.type trap_entry, @function
+.align 2
+trap_entry:
+    csrr a0, mcause
+    csrr a1, mepc
+    csrr a2, mtval
+    call trap_handler
+
+2:
+    wfi
+    j 2b
+.size trap_entry, . - trap_entry
