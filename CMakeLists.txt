@@ -19,6 +19,7 @@ add_executable(kernel
     src/kernel/console.cpp
     src/kernel/heap.cpp
     src/kernel/physical_page_allocator.cpp
+    src/kernel/runtime.cpp
     src/riscv/trap.cpp
     src/kernel/main.cpp
 )

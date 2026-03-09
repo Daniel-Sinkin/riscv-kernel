@@ -3,7 +3,9 @@
 # init b.c. this is initialisation code,
 # so basically we say this is the executable initialisaiton code
 # This puts the following emitted code into the section named .text.init
-.section .text.init 
+// boot/start.S
+
+.section .text.init
 
 
 # Makes _start globally visible, b.c. of ENTRY(_start) this is the entry point

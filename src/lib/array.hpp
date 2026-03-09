@@ -1,3 +1,5 @@
+// lib/array.hpp
+
 #pragma once
 
 #include "common.hpp"

@@ -1,3 +1,5 @@
+// kernel/console.cpp
+
 #include "kernel/console.hpp"
 
 #include "qemu_virt/syscon.hpp"

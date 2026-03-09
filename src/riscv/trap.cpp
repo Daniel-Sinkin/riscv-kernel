@@ -1,3 +1,5 @@
+// riscv/trap.cpp
+
 #include "riscv/trap.hpp"
 
 #include "kernel/console.hpp"

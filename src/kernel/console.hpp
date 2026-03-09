@@ -1,3 +1,5 @@
+// kernel/console.hpp
+
 #pragma once
 
 #include "common.hpp"
