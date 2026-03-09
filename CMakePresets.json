@@ -10,7 +10,7 @@
       "name": "riscv64-debug",
       "displayName": "RISC-V Debug",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/riscv64-debug",
+      "binaryDir": "${sourceDir}/build",
       "toolchainFile": "${sourceDir}/cmake/riscv64-toolchain.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",

@@ -92,7 +92,7 @@ auto write_named_text(const char *name, const char *value) -> void {
     kernel::putc('\n');
 }
 
-} // namespace
+}
 
 extern "C" [[noreturn]] void trap_handler(u64 mcause, u64 mepc, u64 mtval) {
     const auto is_interrupt = (mcause & k_trap_interrupt_bit) != 0;

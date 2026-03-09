@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUILD_DIR="${BUILD_DIR:-${ROOT_DIR}/build/riscv64-debug}"
+BUILD_DIR="${BUILD_DIR:-${ROOT_DIR}/build}"
 ACTION="${1:-build}"
 RISCV_ARCH="${RISCV_ARCH:-rv64imac_zicsr}"
 RISCV_ABI="${RISCV_ABI:-lp64}"

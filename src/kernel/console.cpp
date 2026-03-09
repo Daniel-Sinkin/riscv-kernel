@@ -38,4 +38,4 @@ auto write(const char *c, usize n) -> void {
     }
 }
 
-} // namespace kernel
+}

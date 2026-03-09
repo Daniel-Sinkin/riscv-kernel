@@ -37,4 +37,4 @@ inline auto write_bits(U x) -> void {
     }
 }
 
-} // namespace kernel
+}

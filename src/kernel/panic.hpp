@@ -4,4 +4,4 @@ namespace kernel {
 
 [[noreturn]] auto panic(const char *msg) -> void;
 
-}  // namespace kernel
+}

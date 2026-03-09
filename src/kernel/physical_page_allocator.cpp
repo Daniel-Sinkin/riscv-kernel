@@ -97,7 +97,7 @@ private:
 };
 
 PhysicalPageAllocator g_allocator{};
-} // namespace
+}
 
 namespace kernel::physical_memory {
 
@@ -117,4 +117,4 @@ auto free_page(uptr addr) -> void {
     g_allocator.free_page(addr);
 }
 
-} // namespace kernel::physical_memory
+}

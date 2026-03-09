@@ -21,4 +21,4 @@ auto write_uart_transmit(u8 value) -> void {
     write_uart(UartRegister::transmitter_holding_register, value);
 }
 
-}  // namespace qemu_virt
+}

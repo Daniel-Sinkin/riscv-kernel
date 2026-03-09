@@ -18,4 +18,4 @@ inline auto mmio_read8(uptr addr) -> u8 {
     return mmio_read<u8>(addr);
 }
 
-}  // namespace qemu_virt
+}

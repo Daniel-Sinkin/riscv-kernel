@@ -39,4 +39,4 @@ auto read_uart(UartRegister uart_reg) -> u8;
 auto write_uart(UartRegister uart_reg, u8 value) -> void;
 auto write_uart_transmit(u8 value) -> void;
 
-} // namespace qemu_virt
+}

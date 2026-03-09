@@ -95,7 +95,7 @@ auto require_initialized() -> void {
     }
 }
 
-} // namespace
+}
 
 auto init_heap() -> void {
     g_heap_page = physical_memory::alloc_page();
@@ -151,6 +151,16 @@ auto malloc(usize n) -> void * {
     return nullptr;
 }
 
+auto realloc(void *ptr) -> void * {
+    require_initialized();
+
+    if (ptr == nullptr) {
+        panic("Called realloc with nullptr");
+        return nullptr;
+    }
+    return nullptr;
+}
+
 auto free(void *ptr) -> void {
     require_initialized();
 
@@ -176,4 +186,4 @@ auto free(void *ptr) -> void {
     }
 }
 
-} // namespace kernel
+}

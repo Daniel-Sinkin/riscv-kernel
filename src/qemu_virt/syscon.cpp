@@ -12,4 +12,4 @@ auto syscon_reboot() -> void {
     mmio_write(k_syscon_base, k_syscon_reboot);
 }
 
-}  // namespace qemu_virt
+}

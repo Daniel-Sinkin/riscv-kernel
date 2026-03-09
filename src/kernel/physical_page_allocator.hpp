@@ -17,4 +17,4 @@ auto alloc_page() -> Page *;
 auto free_page(uptr addr) -> void;
 auto free_page(Page *page) -> void;
 
-} // namespace kernel::physical_memory
+}
