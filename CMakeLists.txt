@@ -18,6 +18,7 @@ add_executable(kernel
     src/qemu_virt/uart.cpp
     src/kernel/console.cpp
     src/kernel/panic.cpp
+    src/kernel/physical_page_allocator.cpp
     src/riscv/trap.cpp
     src/kernel/main.cpp
 )

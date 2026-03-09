@@ -15,3 +15,15 @@ using i64 = std::int64_t;
 
 using uptr = std::uintptr_t;
 using usize = std::size_t;
+
+constexpr auto operator""_KiB(unsigned long long value) -> usize {
+    return static_cast<usize>(value) * 1024;
+}
+
+constexpr auto operator""_MiB(unsigned long long value) -> usize {
+    return static_cast<usize>(value) * 1024_KiB;
+}
+
+constexpr auto operator""_GiB(unsigned long long value) -> usize {
+    return static_cast<usize>(value) * 1024_MiB;
+}
