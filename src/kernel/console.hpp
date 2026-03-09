@@ -60,6 +60,8 @@ inline auto write_number(I x) -> void
         if (x < 0)
         {
             putc('-');
+            // Based on
+            // https://github.com/nuta/operating-system-in-1000-lines/issues/64
             magnitude = static_cast<U>(-(x + 1)) + 1;
         }
         else
@@ -93,5 +95,7 @@ inline auto write_number(I x) -> void
         putc(digits[count]);
     }
 }
+
+auto printf(const char* fmt, ...) -> void;
 
 }  // namespace kernel

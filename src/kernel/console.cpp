@@ -4,9 +4,85 @@
 
 #include "qemu_virt/syscon.hpp"
 #include "qemu_virt/uart.hpp"
+#include "util.hpp"
+
+#include <cstdarg>
 
 namespace kernel
 {
+
+namespace
+{
+
+auto write_format_specifier(char specifier, va_list& vargs) -> bool
+{
+    switch (specifier)
+    {
+        case '\0':
+            putc('%');
+            return false;
+        case '%':
+            putc('%');
+            return true;
+        case 's':
+            {
+                auto s = va_arg(vargs, const char*);
+                if (s == nullptr)
+                {
+                    s = "(null)";
+                }
+                while (*s != '\0')
+                {
+                    putc(*s);
+                    ++s;
+                }
+                return true;
+            }
+        case 'd':
+            {
+                const auto value = va_arg(vargs, int);
+                write_number(value);
+                return true;
+            }
+        case 'x':
+            {
+                const auto value = va_arg(vargs, unsigned int);
+                write_hex(value);
+                return true;
+            }
+        default:
+            putc('%');
+            putc(specifier);
+            return true;
+    }
+}
+
+}  // namespace
+
+auto printf(const char* fmt, ...) -> void
+{
+    va_list vargs;
+    va_start(vargs, fmt);
+    ScopeExit se{[&] { va_end(vargs); }};
+
+    while (*fmt != '\0')
+    {
+        if (*fmt != '%')
+        {
+            putc(*fmt);
+            ++fmt;
+            continue;
+        }
+
+        ++fmt;
+        if (!write_format_specifier(*fmt, vargs))
+        {
+            return;
+        }
+
+        ++fmt;
+    }
+}
 
 auto putc(char c) -> void
 {
