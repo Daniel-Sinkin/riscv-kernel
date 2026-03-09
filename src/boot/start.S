@@ -30,6 +30,7 @@ _start:
     #               to the start (i.e. top) of the stack
     la sp, __stack_top
 
+    # Marks trap_entry as the trap handler
     la t0, trap_entry
     csrw mtvec, t0
 

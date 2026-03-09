@@ -45,3 +45,5 @@
 .nvimlog
 
 .cache/
+
+.DS_Store

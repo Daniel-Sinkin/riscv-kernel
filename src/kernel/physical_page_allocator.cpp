@@ -7,7 +7,7 @@ extern std::byte _kernel_end[];
 }
 
 namespace {
-
+using namespace kernel::physical_memory;
 class PhysicalPageAllocator {
 public:
     auto init(usize num_pages) -> void {
@@ -22,7 +22,7 @@ public:
         initialized_ = true;
     }
 
-    auto alloc_page() -> std::byte * {
+    auto alloc_page() -> Page * {
         require_initialized("alloc_page on not init");
 
         for (auto byte_offset = 0zu; byte_offset < bitmap_size_; ++byte_offset) {
@@ -36,16 +36,15 @@ public:
                 const auto bit_mask = static_cast<u8>(1u << bit_offset);
                 if ((byte_ & bit_mask) == 0) {
                     bitmap_start_[byte_offset] |= bit_mask;
-                    return reinterpret_cast<std::byte *>(
+                    return reinterpret_cast<Page *>(
                         pages_start_ + kernel::physical_memory::k_page_size * page_index);
                 }
             }
         }
-
         kernel::panic("No free page left");
     }
 
-    auto free_page(std::byte *page) -> void {
+    auto free_page(Page *page) -> void {
         free_page(reinterpret_cast<uptr>(page));
     }
 
@@ -67,11 +66,10 @@ public:
         const auto bit_mask = static_cast<u8>(1u << bit_offset);
 
         if ((bitmap_start_[byte_offset] & bit_mask) == 0) {
-            kernel::panic("free_page on free page");
+            kernel::panic("free_page on already free page");
         }
 
-        bitmap_start_[byte_offset] =
-            static_cast<u8>(bitmap_start_[byte_offset] & static_cast<u8>(~bit_mask));
+        bitmap_start_[byte_offset] &= ~bit_mask;
 
         auto *page_bytes = reinterpret_cast<std::byte *>(addr);
         for (auto i = 0zu; i < kernel::physical_memory::k_page_size; ++i) {
@@ -99,10 +97,7 @@ private:
 };
 
 PhysicalPageAllocator g_allocator{};
-
 } // namespace
-
-static_assert(kernel::physical_memory::k_default_num_pages * kernel::physical_memory::k_page_size == 128_MiB);
 
 namespace kernel::physical_memory {
 
@@ -110,12 +105,12 @@ auto init(usize num_pages) -> void {
     g_allocator.init(num_pages);
 }
 
-auto alloc_page() -> std::byte * {
+auto alloc_page() -> Page * {
     return g_allocator.alloc_page();
 }
 
-auto free_page(std::byte *page) -> void {
-    g_allocator.free_page(page);
+auto free_page(Page *p) -> void {
+    g_allocator.free_page(p);
 }
 
 auto free_page(uptr addr) -> void {
