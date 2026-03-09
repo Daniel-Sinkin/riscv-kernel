@@ -1,7 +1,7 @@
 #include "kernel/console.hpp"
-#include "kernel/heap.hpp"
 #include "kernel/physical_page_allocator.hpp"
 #include "lib/array.hpp"
+#include "lib/vector.hpp"
 
 extern "C" [[noreturn]] auto kernel_main() -> void
 {
@@ -25,35 +25,38 @@ extern "C" [[noreturn]] auto kernel_main() -> void
         kernel::putc('\n');
     }
 
-    auto* ints = static_cast<int*>(kernel::malloc(2 * sizeof(int)));
-    if (ints == nullptr)
-    {
-        kernel::panic("malloc failed");
-    }
+    ds_lib::Vector<int> ints{};
+    ints.push_back(123);
+    ints.push_back(456);
+    ints.push_back(789);
 
-    ints[0] = 123;
-    ints[1] = 456;
-
-    ints = static_cast<int*>(kernel::realloc(ints, 4 * sizeof(int)));
-    if (ints == nullptr)
-    {
-        kernel::panic("realloc grow failed");
-    }
-
-    kernel::write_number(ints[0]);
+    kernel::write_number(ints.front());
     kernel::putc('\n');
-    kernel::write_number(ints[1]);
+    kernel::write_number(ints.back());
     kernel::putc('\n');
 
-    ints = static_cast<int*>(kernel::realloc(ints, sizeof(int)));
-    if (ints == nullptr)
+    for (auto it = ints.cbegin(); it != ints.cend(); ++it)
     {
-        kernel::panic("realloc shrink failed");
+        kernel::write_number(*it);
+        kernel::putc('\n');
     }
 
-    kernel::write_number(ints[0]);
+    ints.pop_back();
+    ints.shrink_to_fit();
+
+    kernel::write_number(ints.back());
     kernel::putc('\n');
-    kernel::free(ints);
+
+    ints.resize(4, 900);
+    kernel::write_number(ints.back());
+    kernel::putc('\n');
+
+    ints.assign(3, 11);
+    for (auto it = ints.cbegin(); it != ints.cend(); ++it)
+    {
+        kernel::write_number(*it);
+        kernel::putc('\n');
+    }
 
     kernel::panic("Finished Running");
 }
