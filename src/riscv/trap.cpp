@@ -3,7 +3,6 @@
 #include <concepts>
 
 #include "kernel/console.hpp"
-#include "kernel/panic.hpp"
 
 namespace {
 

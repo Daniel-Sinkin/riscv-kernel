@@ -1,6 +1,6 @@
 #include "kernel/physical_page_allocator.hpp"
 
-#include "kernel/panic.hpp"
+#include "kernel/console.hpp"
 
 extern "C" {
 extern std::byte _kernel_end[];

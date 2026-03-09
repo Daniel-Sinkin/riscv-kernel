@@ -1,5 +1,6 @@
 #include "kernel/console.hpp"
 
+#include "qemu_virt/syscon.hpp"
 #include "qemu_virt/uart.hpp"
 
 namespace kernel {
@@ -35,6 +36,14 @@ auto write(const char *c, usize n) -> void {
     while (n-- > 0) {
         putc(*c);
         ++c;
+    }
+}
+
+[[noreturn]] auto panic(const char *msg) -> void {
+    putsln(msg);
+    while (true) {
+        qemu_virt::syscon_poweroff();
+        asm volatile("wfi");
     }
 }
 
