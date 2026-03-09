@@ -1,16 +1,16 @@
 #pragma once
 
-#include <concepts>
-#include <type_traits>
-
 #include "common.hpp"
 #include "kernel/console.hpp"
 #include "kernel/heap.hpp"
 
-namespace ds_lib
+#include <limits>
+#include <type_traits>
+
+namespace lib
 {
 template <typename T>
-    requires (std::is_trivially_copyable_v<T> && std::is_trivially_default_constructible_v<T>)
+    requires(std::is_trivially_copyable_v<T> && std::is_trivially_default_constructible_v<T>)
 class Vector
 {
   public:
@@ -25,9 +25,7 @@ class Vector
     auto operator=(const Vector&) -> Vector& = delete;
 
     Vector(Vector&& other) noexcept
-        : data_(other.data_)
-        , size_(other.size_)
-        , capacity_(other.capacity_)
+        : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
     {
         other.data_ = nullptr;
         other.size_ = 0;
@@ -88,22 +86,50 @@ class Vector
         return data_[idx];
     }
 
+    auto front() -> T&
+    {
+        if (empty())
+        {
+            kernel::panic("front on empty Vector");
+        }
+        return data_[0];
+    }
+    auto front() const -> const T&
+    {
+        if (empty())
+        {
+            kernel::panic("front on empty Vector");
+        }
+        return data_[0];
+    }
+    auto back() -> T&
+    {
+        if (empty())
+        {
+            kernel::panic("back on empty Vector");
+        }
+        return data_[size_ - 1];
+    }
+    auto back() const -> const T&
+    {
+        if (empty())
+        {
+            kernel::panic("back on empty Vector");
+        }
+        return data_[size_ - 1];
+    }
     // clang-format off
-    auto front() -> T& { require_not_empty("front on empty Vector"); return data_[0]; }
-    auto front() const -> const T& { require_not_empty("front on empty Vector"); return data_[0]; }
-    auto back() -> T& { require_not_empty("back on empty Vector"); return data_[size_ - 1]; }
-    auto back() const -> const T& { require_not_empty("back on empty Vector"); return data_[size_ - 1]; }
-    auto data() -> T* { return data_; }
-    auto data() const -> const T* { return data_; }
-    auto begin() -> T* { return data_; }
-    auto begin() const -> const T* { return data_; }
-    auto cbegin() const -> const T* { return data_; }
-    auto end() -> T* { return data_ == nullptr ? nullptr : data_ + size_; }
-    auto end() const -> const T* { return data_ == nullptr ? nullptr : data_ + size_; }
-    auto cend() const -> const T* { return data_ == nullptr ? nullptr : data_ + size_; }
-    auto empty() const noexcept -> bool { return size_ == 0; }
-    auto size() const noexcept -> usize { return size_; }
-    auto capacity() const noexcept -> usize { return capacity_; }
+    auto data()                    ->       T* { return data_; }
+    auto data()     const          -> const T* { return data_; }
+    auto begin()                   ->       T* { return data_; }
+    auto begin()    const          -> const T* { return data_; }
+    auto cbegin()   const          -> const T* { return data_; }
+    auto end()                     ->       T* { return data_ == nullptr ? nullptr : data_ + size_; }
+    auto end()      const          -> const T* { return data_ == nullptr ? nullptr : data_ + size_; }
+    auto cend()     const          -> const T* { return data_ == nullptr ? nullptr : data_ + size_; }
+    auto empty()    const noexcept -> bool     { return size_ == 0; }
+    auto size()     const noexcept -> usize    { return size_; }
+    auto capacity() const noexcept -> usize    { return capacity_; }
     // clang-format on
 
     auto push_back(T x) -> void
@@ -219,7 +245,7 @@ class Vector
   private:
     static constexpr auto max_count() -> usize
     {
-        return static_cast<usize>(-1) / sizeof(T);
+        return std::numeric_limits<usize>::max() / sizeof(T);
     }
 
     auto next_capacity() const -> usize
@@ -263,4 +289,4 @@ class Vector
     usize size_{};
     usize capacity_{};
 };
-}
+}  // namespace lib

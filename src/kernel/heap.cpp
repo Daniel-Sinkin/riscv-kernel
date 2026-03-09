@@ -256,7 +256,8 @@ auto require_initialized() -> void
     }
 }
 
-[[nodiscard]] auto require_allocated_block_from_payload(std::byte* addr, const char* message) -> BlockHeader*
+[[nodiscard]] auto require_allocated_block_from_payload(std::byte* addr, const char* message)
+    -> BlockHeader*
 {
     if (addr < page_bytes() + first_block_offset() + sizeof(BlockHeader) || addr >= page_end())
     {

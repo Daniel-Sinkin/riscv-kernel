@@ -2,11 +2,13 @@
 
 #include "common.hpp"
 
-namespace qemu_virt {
+namespace qemu_virt
+{
 
 constexpr uptr k_uart_base{0x10000000};
 
-enum class UartRegister : u8 {
+enum class UartRegister : u8
+{
     receiver_buffer_register = 0x00,
     transmitter_holding_register = 0x00,
     divisor_latch_low = 0x00,
@@ -24,7 +26,8 @@ enum class UartRegister : u8 {
     scratch_register = 0x07,
 };
 
-enum class UartLineStatus : u8 {
+enum class UartLineStatus : u8
+{
     data_ready = 1u << 0,
     overrun_error = 1u << 1,
     parity_error = 1u << 2,
@@ -39,4 +42,4 @@ auto read_uart(UartRegister uart_reg) -> u8;
 auto write_uart(UartRegister uart_reg, u8 value) -> void;
 auto write_uart_transmit(u8 value) -> void;
 
-}
+}  // namespace qemu_virt

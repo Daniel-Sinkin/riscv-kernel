@@ -1,14 +1,12 @@
 #pragma once
 
-#include <concepts>
-
 #include "common.hpp"
 #include "kernel/console.hpp"
 
-namespace ds_lib
+namespace lib
 {
 template <typename T, usize N>
-    requires (N > 0)
+    requires(N > 0)
 class Array
 {
   public:
@@ -68,4 +66,4 @@ class Array
   private:
     T data_[N];
 };
-}
+}  // namespace lib
