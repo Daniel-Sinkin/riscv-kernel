@@ -30,40 +30,27 @@ class Vector
 
     auto operator=(const Vector& other) -> Vector&
     {
-        if (this == &other)
+        if (this != &other)
         {
-            return *this;
+            clear();
+            copy_from(other);
         }
-
-        clear();
-        copy_from(other);
         return *this;
     }
 
     Vector(Vector&& other) noexcept
-        : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
     {
-        other.data_ = nullptr;
-        other.size_ = 0;
-        other.capacity_ = 0;
+        steal_from(other);
     }
 
     auto operator=(Vector&& other) noexcept -> Vector&
     {
-        if (this == &other)
+        if (this != &other)
         {
-            return *this;
+            clear();
+            deallocate_raw(data_);
+            steal_from(other);
         }
-
-        clear();
-        deallocate_raw(data_);
-        data_ = other.data_;
-        size_ = other.size_;
-        capacity_ = other.capacity_;
-
-        other.data_ = nullptr;
-        other.size_ = 0;
-        other.capacity_ = 0;
         return *this;
     }
 
@@ -124,18 +111,27 @@ class Vector
         return data_[size_ - 1];
     }
     // clang-format off
-    auto data()                    ->       T* { return data_; }
-    auto data()     const          -> const T* { return data_; }
-    auto begin()                   ->       T* { return data_; }
-    auto begin()    const          -> const T* { return data_; }
-    auto cbegin()   const          -> const T* { return data_; }
-    auto end()                     ->       T* { return data_ == nullptr ? nullptr : data_ + size_; }
-    auto end()      const          -> const T* { return data_ == nullptr ? nullptr : data_ + size_; }
-    auto cend()     const          -> const T* { return data_ == nullptr ? nullptr : data_ + size_; }
-    auto empty()    const noexcept -> bool     { return size_ == 0; }
-    auto size()     const noexcept -> usize    { return size_; }
-    auto capacity() const noexcept -> usize    { return capacity_; }
+    [[nodiscard]] auto data()         ->       T* { return data_; }
+    [[nodiscard]] auto data()   const -> const T* { return data_; }
+    [[nodiscard]] auto begin()        ->       T* { return data_; }
+    [[nodiscard]] auto begin()  const -> const T* { return data_; }
+    [[nodiscard]] auto cbegin() const -> const T* { return data_; }
+    [[nodiscard]] auto end()          ->       T* { return (!data_) ? nullptr : data_ + size_; }
+    [[nodiscard]] auto end()    const -> const T* { return (!data_) ? nullptr : data_ + size_; }
+    [[nodiscard]] auto cend()   const -> const T* { return (!data_) ? nullptr : data_ + size_; }
     // clang-format on
+    [[nodiscard]] auto empty() const noexcept -> bool
+    {
+        return size_ == 0;
+    }
+    [[nodiscard]] auto size() const noexcept -> usize
+    {
+        return size_;
+    }
+    [[nodiscard]] auto capacity() const noexcept -> usize
+    {
+        return capacity_;
+    }
 
     auto push_back(const T& x) -> void
     {
@@ -377,6 +373,16 @@ class Vector
         {
             kernel::panicf("'%s()' on empty vector", fn_name);
         }
+    }
+
+    auto steal_from(Vector other) -> void
+    {
+        data_ = other.data_;
+        size_ = other.size_;
+        capacity_ = other.capacity_;
+        other.data_ = nullptr;
+        other.size_ = 0;
+        other.capacity_ = 0;
     }
 
     T* data_{};

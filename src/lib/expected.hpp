@@ -14,12 +14,20 @@ template <typename E>
 class Unexpected
 {
   public:
-    // clang-format off
-    Unexpected(const E& value) : value_(value) {}
-    Unexpected(E&& value) : value_(std::move(value)) {}
-    [[nodiscard]] auto value() -> E& { return value_; }
-    [[nodiscard]] auto value() const -> const E& { return value_; }
-    // clang-format on
+    Unexpected(const E& value) : value_(value)
+    {
+    }
+    Unexpected(E&& value) : value_(std::move(value))
+    {
+    }
+    [[nodiscard]] auto value() -> E&
+    {
+        return value_;
+    }
+    [[nodiscard]] auto value() const -> const E&
+    {
+        return value_;
+    }
 
   private:
     E value_;
@@ -29,12 +37,22 @@ template <typename T, typename E>
 class Expected
 {
   public:
-    // clang-format off
-    Expected(const T& value) { emplace_value(value); }
-    Expected(T&& value) { emplace_value(std::move(value)); }
-    Expected(const Unexpected<E>& error) { emplace_error(error.value()); }
-    Expected(Unexpected<E>&& error) { emplace_error(std::move(error.value())); }
-    // clang-format on
+    Expected(const T& value)
+    {
+        emplace_value(value);
+    }
+    Expected(T&& value)
+    {
+        emplace_value(std::move(value));
+    }
+    Expected(const Unexpected<E>& error)
+    {
+        emplace_error(error.value());
+    }
+    Expected(Unexpected<E>&& error)
+    {
+        emplace_error(std::move(error.value()));
+    }
 
     Expected(const Expected& other)
     {
@@ -52,15 +70,16 @@ class Expected
         return *this;
     }
 
-    Expected(Expected&& other) noexcept(
-        std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<E>)
+    Expected(
+        Expected&& other
+    ) noexcept(std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<E>)
     {
         move_from(std::move(other));
     }
 
     auto operator=(Expected&& other) noexcept(
-        std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<E>)
-        -> Expected&
+        std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<E>
+    ) -> Expected&
     {
         if (this == &other)
         {
@@ -132,17 +151,23 @@ class Expected
     }
 
     // clang-format off
-    [[nodiscard]] auto value() -> T& { require_value(); return storage_.value_; }
-    [[nodiscard]] auto value() const -> const T& { require_value(); return storage_.value_; }
-    [[nodiscard]] auto error() -> E& { require_error(); return storage_.error_; }
-    [[nodiscard]] auto error() const -> const E& { require_error(); return storage_.error_; }
-    [[nodiscard]] auto operator*() -> T& { return value(); }
-    [[nodiscard]] auto operator*() const -> const T& { return value(); }
-    [[nodiscard]] auto operator->() -> T* { require_value(); return &storage_.value_; }
+    [[nodiscard]] auto value()      const -> const T& { require_value(); return storage_.value_; }
+    [[nodiscard]] auto value()            ->       T& { require_value(); return storage_.value_; }
+    [[nodiscard]] auto error()      const -> const E& { require_error(); return storage_.error_; }
+    [[nodiscard]] auto error()            ->       E& { require_error(); return storage_.error_; }
+    [[nodiscard]] auto operator*()  const -> const T& { return value(); }
+    [[nodiscard]] auto operator*()        ->       T& { return value(); }
     [[nodiscard]] auto operator->() const -> const T* { require_value(); return &storage_.value_; }
-    [[nodiscard]] auto has_value() const noexcept -> bool { return initialized_ && has_value_; }
-    [[nodiscard]] explicit operator bool() const noexcept { return has_value(); }
+    [[nodiscard]] auto operator->()       ->       T* { require_value(); return &storage_.value_; }
     // clang-format on
+    [[nodiscard]] auto has_value() const noexcept -> bool
+    {
+        return initialized_ && has_value_;
+    }
+    [[nodiscard]] explicit operator bool() const noexcept
+    {
+        return has_value();
+    }
 
   private:
     auto require_value() const -> void
@@ -178,7 +203,8 @@ class Expected
     }
 
     auto move_from(Expected&& other) noexcept(
-        std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<E>) -> void
+        std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<E>
+    ) -> void
     {
         if (other.has_value_)
         {
@@ -199,8 +225,12 @@ class Expected
 
     union Storage
     {
-        constexpr Storage() {}
-        ~Storage() {}
+        constexpr Storage()
+        {
+        }
+        ~Storage()
+        {
+        }
 
         T value_;
         E error_;

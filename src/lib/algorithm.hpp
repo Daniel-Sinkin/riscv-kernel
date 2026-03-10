@@ -26,6 +26,9 @@ constexpr auto abs(I x) -> I
 {
     if (x == std::numeric_limits<I>::lowest())
     {
+        // There is no good way to handle INT_MIN for std::abs
+        // Just going to pass back the negative nubmer
+        // to signal that abs failed
         return x;
     }
     return (x < 0) ? -x : x;

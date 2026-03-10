@@ -97,12 +97,12 @@ class Optional
     }
 
     // clang-format off
-    [[nodiscard]] auto value() -> T& { require_value(); return *ptr(); }
-    [[nodiscard]] auto value() const -> const T& { require_value(); return *ptr(); }
-    [[nodiscard]] auto operator*() -> T& { return value(); }
-    [[nodiscard]] auto operator*() const -> const T& { return value(); }
-    [[nodiscard]] auto operator->() -> T* { require_value(); return ptr(); }
+    [[nodiscard]] auto value()      const -> const T& { require_value(); return *ptr(); }
+    [[nodiscard]] auto value()            ->       T& { require_value(); return *ptr(); }
+    [[nodiscard]] auto operator*() const  -> const T& { return value(); }
+    [[nodiscard]] auto operator*()        ->       T& { return value(); }
     [[nodiscard]] auto operator->() const -> const T* { require_value(); return ptr(); }
+    [[nodiscard]] auto operator->()       ->       T* { require_value(); return ptr(); }
     [[nodiscard]] auto has_value() const noexcept -> bool { return has_value_; }
     [[nodiscard]] explicit operator bool() const noexcept { return has_value_; }
     // clang-format on
@@ -147,8 +147,8 @@ class Optional
     }
 
     // clang-format off
-    [[nodiscard]] auto ptr() -> T* { return reinterpret_cast<T*>(&storage_); }
     [[nodiscard]] auto ptr() const -> const T* { return reinterpret_cast<const T*>(&storage_); }
+    [[nodiscard]] auto ptr()       ->       T* { return reinterpret_cast<T*>(&storage_); }
     // clang-format on
 
     Storage storage_{};

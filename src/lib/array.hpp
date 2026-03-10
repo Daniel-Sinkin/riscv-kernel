@@ -49,21 +49,28 @@ class Array
     }
 
     // clang-format off
-    auto front() -> T& { return data_[0]; }
-    auto front() const -> const T& { return data_[0]; }
-    auto back() -> T& { return data_[N - 1]; }
-    auto back() const -> const T& { return data_[N - 1]; }
-    auto data() -> T* { return data_; }
-    auto data() const -> const T* { return data_; }
-    auto begin() -> T* { return data_; }
-    auto begin() const -> const T* { return data_; }
-    auto cbegin() const -> const T* { return data_; }
-    auto end() -> T* { return data_ + N; }
-    auto end() const -> const T* { return data_ + N; }
-    auto cend() const -> const T* { return data_ + N; }
-    static constexpr auto size() -> usize { return N; }
-    static constexpr auto empty() -> bool { return N == 0; }
+    [[nodiscard]] auto front()  const -> const T& { return data_[0]; }
+    [[nodiscard]] auto front()        ->       T& { return data_[0]; }
+    [[nodiscard]] auto back()   const -> const T& { return data_[N - 1]; }
+    [[nodiscard]] auto back()         ->       T& { return data_[N - 1]; }
+    [[nodiscard]] auto data()   const -> const T* { return data_; }
+    [[nodiscard]] auto data()         ->       T* { return data_; }
+    [[nodiscard]] auto begin()  const -> const T* { return data_; }
+    [[nodiscard]] auto begin()        ->       T* { return data_; }
+    [[nodiscard]] auto cbegin()       -> const T* { return data_; }
+    [[nodiscard]] auto end()    const -> const T* { return data_ + N; }
+    [[nodiscard]] auto end()          ->       T* { return data_ + N; }
+    [[nodiscard]] auto cend()         -> const T* { return data_ + N; }
     // clang-format on
+
+    [[nodiscard]] static constexpr auto size() -> usize
+    {
+        return N;
+    }
+    [[nodiscard]] static constexpr auto empty() -> bool
+    {
+        return N == 0;
+    }
 
   private:
     T data_[N];
