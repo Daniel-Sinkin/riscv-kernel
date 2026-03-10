@@ -16,7 +16,10 @@ auto putc(std::byte value) -> void;
 auto puts(const char* c) -> void;
 auto putsln(const char* c) -> void;
 auto write(const char* c, usize n) -> void;
+auto printf(const char* fmt, ...) -> void;
+auto printfn(const char* fmt, ...) -> void;
 [[noreturn]] auto panic(const char* msg) -> void;
+[[noreturn]] auto panicf(const char* fmt, ...) -> void;
 
 template <std::unsigned_integral U>
 inline auto write_hex(U x) -> void
@@ -95,7 +98,5 @@ inline auto write_number(I x) -> void
         putc(digits[count]);
     }
 }
-
-auto printf(const char* fmt, ...) -> void;
 
 }  // namespace kernel

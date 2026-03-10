@@ -57,14 +57,8 @@ auto write_format_specifier(char specifier, va_list& vargs) -> bool
     }
 }
 
-}  // namespace
-
-auto printf(const char* fmt, ...) -> void
+auto vprintf(const char* fmt, va_list& vargs) -> void
 {
-    va_list vargs;
-    va_start(vargs, fmt);
-    ScopeExit se{[&] { va_end(vargs); }};
-
     while (*fmt != '\0')
     {
         if (*fmt != '%')
@@ -83,6 +77,24 @@ auto printf(const char* fmt, ...) -> void
         ++fmt;
     }
 }
+
+}  // namespace
+
+auto printf(const char* fmt, ...) -> void
+{
+    va_list vargs;
+    va_start(vargs, fmt);
+    ScopeExit se{[&] { va_end(vargs); }};
+    vprintf(fmt, vargs);
+}
+auto printfn(const char* fmt, ...) -> void
+{
+    va_list vargs;
+    va_start(vargs, fmt);
+    ScopeExit se{[&] { va_end(vargs); }};
+    vprintf(fmt, vargs);
+    putc('\n');
+};
 
 auto putc(char c) -> void
 {
@@ -127,14 +139,29 @@ auto write(const char* c, usize n) -> void
     }
 }
 
-[[noreturn]] auto panic(const char* msg) -> void
+[[noreturn]] auto _panic() -> void
 {
-    putsln(msg);
     while (true)
     {
         qemu_virt::syscon_poweroff();
         asm volatile("wfi");
     }
+}
+
+[[noreturn]] auto panic(const char* msg) -> void
+{
+    putsln(msg);
+    _panic();
+}
+
+[[noreturn]] auto panicf(const char* fmt, ...) -> void
+{
+    va_list vargs;
+    va_start(vargs, fmt);
+    ScopeExit se{[&] { va_end(vargs); }};
+    vprintf(fmt, vargs);
+    va_end(vargs);
+    _panic();
 }
 
 }  // namespace kernel
