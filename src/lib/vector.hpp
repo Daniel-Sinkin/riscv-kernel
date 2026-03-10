@@ -4,15 +4,14 @@
 
 #include "common.hpp"
 #include "kernel/console.hpp"
-#include "kernel/heap.hpp"
 
 #include <limits>
 #include <type_traits>
+#include <utility>
 
 namespace lib
 {
 template <typename T>
-    requires(std::is_trivially_copyable_v<T> && std::is_trivially_default_constructible_v<T>)
 class Vector
 {
   public:
@@ -20,11 +19,26 @@ class Vector
 
     ~Vector()
     {
-        kernel::free(data_);
+        clear();
+        deallocate_raw(data_);
     }
 
-    Vector(const Vector&) = delete;
-    auto operator=(const Vector&) -> Vector& = delete;
+    Vector(const Vector& other)
+    {
+        copy_from(other);
+    }
+
+    auto operator=(const Vector& other) -> Vector&
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        clear();
+        copy_from(other);
+        return *this;
+    }
 
     Vector(Vector&& other) noexcept
         : data_(other.data_), size_(other.size_), capacity_(other.capacity_)
@@ -41,7 +55,8 @@ class Vector
             return *this;
         }
 
-        kernel::free(data_);
+        clear();
+        deallocate_raw(data_);
         data_ = other.data_;
         size_ = other.size_;
         capacity_ = other.capacity_;
@@ -122,38 +137,38 @@ class Vector
     auto capacity() const noexcept -> usize    { return capacity_; }
     // clang-format on
 
-    auto push_back(T x) -> void
+    auto push_back(const T& x) -> void
     {
-        if (size_ == capacity_)
-        {
-            const auto new_capacity = next_capacity();
-            reserve(new_capacity);
-        }
+        emplace_back(x);
+    }
 
-        data_[size_] = x;
+    auto push_back(T&& x) -> void
+    {
+        emplace_back(std::move(x));
+    }
+
+    template <typename... Args>
+    auto emplace_back(Args&&... args) -> T&
+    {
+        ensure_capacity_for_one_more();
+        new (data_ + size_) T(std::forward<Args>(args)...);
         ++size_;
+        return back();
     }
 
     auto pop_back() -> void
     {
         require_not_empty("pop_back");
         --size_;
-        data_[size_] = T{};
+        data_[size_].~T();
     }
 
     auto resize(usize new_size) -> void
-    {
-        resize(new_size, T{});
-    }
-
-    auto resize(usize new_size, const T& value) -> void
+        requires(std::is_default_constructible_v<T>)
     {
         if (new_size < size_)
         {
-            for (auto i = new_size; i < size_; ++i)
-            {
-                data_[i] = T{};
-            }
+            destroy_range(new_size, size_);
             size_ = new_size;
             return;
         }
@@ -164,28 +179,44 @@ class Vector
         }
 
         reserve(new_size);
-        for (auto i = size_; i < new_size; ++i)
+        while (size_ < new_size)
         {
-            data_[i] = value;
+            new (data_ + size_) T();
+            ++size_;
         }
-        size_ = new_size;
+    }
+
+    auto resize(usize new_size, const T& value) -> void
+    {
+        if (new_size < size_)
+        {
+            destroy_range(new_size, size_);
+            size_ = new_size;
+            return;
+        }
+
+        if (new_size == size_)
+        {
+            return;
+        }
+
+        reserve(new_size);
+        while (size_ < new_size)
+        {
+            new (data_ + size_) T(value);
+            ++size_;
+        }
     }
 
     auto assign(usize count, const T& value) -> void
     {
+        clear();
         reserve(count);
-
-        for (auto i = 0zu; i < count; ++i)
+        while (size_ < count)
         {
-            data_[i] = value;
+            new (data_ + size_) T(value);
+            ++size_;
         }
-
-        for (auto i = count; i < size_; ++i)
-        {
-            data_[i] = T{};
-        }
-
-        size_ = count;
     }
 
     auto reserve(usize new_capacity) -> void
@@ -195,13 +226,10 @@ class Vector
             return;
         }
 
-        const auto bytes = bytes_for(new_capacity);
-        auto* new_data = static_cast<T*>(kernel::realloc(data_, bytes));
-        if (new_data == nullptr)
-        {
-            kernel::panic("Failed to reallocate on Vector::reserve()");
-        }
-
+        auto* new_data = allocate_raw(new_capacity);
+        relocate_into(new_data);
+        destroy_range(0, size_);
+        deallocate_raw(data_);
         data_ = new_data;
         capacity_ = new_capacity;
     }
@@ -215,21 +243,24 @@ class Vector
 
         if (size_ == 0)
         {
-            kernel::free(data_);
+            deallocate_raw(data_);
             data_ = nullptr;
             capacity_ = 0;
             return;
         }
 
-        const auto bytes = bytes_for(size_);
-        auto* new_data = static_cast<T*>(kernel::realloc(data_, bytes));
-        if (new_data == nullptr)
-        {
-            kernel::panic("Failed to reallocate on Vector::shrink_to_fit()");
-        }
-
+        auto* new_data = allocate_raw(size_);
+        relocate_into(new_data);
+        destroy_range(0, size_);
+        deallocate_raw(data_);
         data_ = new_data;
         capacity_ = size_;
+    }
+
+    auto clear() noexcept -> void
+    {
+        destroy_range(0, size_);
+        size_ = 0;
     }
 
   private:
@@ -265,6 +296,79 @@ class Vector
             kernel::panic("Overflow on Vector allocation size");
         }
         return count * sizeof(T);
+    }
+
+    static auto allocate_raw(usize count) -> T*
+    {
+        return static_cast<T*>(::operator new(bytes_for(count)));
+    }
+
+    static auto deallocate_raw(T* ptr) noexcept -> void
+    {
+        ::operator delete(ptr);
+    }
+
+    auto ensure_capacity_for_one_more() -> void
+    {
+        if (size_ == capacity_)
+        {
+            reserve(next_capacity());
+        }
+    }
+
+    auto copy_from(const Vector& other) -> void
+    {
+        if (other.size_ == 0)
+        {
+            return;
+        }
+
+        if (capacity_ < other.size_)
+        {
+            deallocate_raw(data_);
+            data_ = allocate_raw(other.size_);
+            capacity_ = other.size_;
+        }
+
+        for (auto i = 0zu; i < other.size_; ++i)
+        {
+            new (data_ + i) T(other.data_[i]);
+            ++size_;
+        }
+    }
+
+    static auto relocate_construct_at(T* dst, T& src) -> void
+    {
+        if constexpr (std::is_move_constructible_v<T>)
+        {
+            new (dst) T(std::move(src));
+        }
+        else
+        {
+            new (dst) T(src);
+        }
+    }
+
+    auto relocate_into(T* new_data) -> void
+    {
+        for (auto i = 0zu; i < size_; ++i)
+        {
+            relocate_construct_at(new_data + i, data_[i]);
+        }
+    }
+
+    auto destroy_range(usize begin_idx, usize end_idx) noexcept -> void
+    {
+        if constexpr (std::is_trivially_destructible_v<T>)
+        {
+            return;
+        }
+
+        while (end_idx > begin_idx)
+        {
+            --end_idx;
+            data_[end_idx].~T();
+        }
     }
 
     auto require_not_empty(const char* fn_name) const -> void
