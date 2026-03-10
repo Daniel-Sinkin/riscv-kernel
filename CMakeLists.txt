@@ -14,6 +14,7 @@ set(RISCV_ABI "lp64" CACHE STRING "RISC-V ABI passed to GCC")
 
 add_executable(kernel
     src/boot/start.S
+    src/riscv/trap_entry.S
     src/qemu_virt/syscon.cpp
     src/qemu_virt/uart.cpp
     src/kernel/console.cpp

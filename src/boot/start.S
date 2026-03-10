@@ -50,17 +50,3 @@ _start:
 # symbol_size(_start) = current_address - address(_start)
 .size _start, . - _start
 # End of _start function
-
-.globl trap_entry
-.type trap_entry, @function
-.align 2
-trap_entry:
-    csrr a0, mcause
-    csrr a1, mepc
-    csrr a2, mtval
-    call trap_handler
-
-2:
-    wfi
-    j 2b
-.size trap_entry, . - trap_entry

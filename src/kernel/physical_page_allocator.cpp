@@ -99,7 +99,7 @@ class PhysicalPageAllocator
     }
 
   private:
-    static constexpr auto align_up(uptr value, usize alignment) -> uptr
+    [[nodiscard]] static constexpr auto align_up(uptr value, usize alignment) -> uptr
     {
         const auto mask = static_cast<uptr>(alignment - 1);
         return (value + mask) & ~mask;
@@ -131,7 +131,7 @@ auto init(usize num_pages) -> void
     g_allocator.init(num_pages);
 }
 
-auto alloc_page() -> Page*
+[[nodiscard]] auto alloc_page() -> Page*
 {
     return g_allocator.alloc_page();
 }
