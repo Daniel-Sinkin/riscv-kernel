@@ -1,5 +1,6 @@
 #include "common.hpp"
 #include "kernel/console.hpp"
+#include "lib/expected.hpp"
 #include "lib/optional.hpp"
 
 struct NonTrivial
@@ -35,9 +36,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     lib::Optional<NonTrivial> o{std::in_place, 5};
     lib::Optional<NonTrivial> copied{o};
     lib::Optional<NonTrivial> moved{std::move(copied)};
+    lib::Optional<int> empty{};
+    lib::Expected<int, int> ok{42};
+    lib::Expected<int, int> err{lib::Unexpected<int>{9}};
 
     kernel::printfn("%d", static_cast<int>(moved->data()));
     kernel::printfn("%d", static_cast<int>(copied.has_value()));
+    kernel::printfn("%d", empty.value_or(7));
+    kernel::printfn("%d", ok.value_or(0));
+    kernel::printfn("%d", err.value_or(0));
+    kernel::printfn("%d", err.error());
 
     return 0;
 }

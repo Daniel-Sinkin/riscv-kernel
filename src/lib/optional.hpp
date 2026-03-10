@@ -86,6 +86,16 @@ class Optional
         has_value_ = false;
     }
 
+    template <typename U>
+    [[nodiscard]] auto value_or(U&& fallback) const -> T
+    {
+        if (has_value_)
+        {
+            return value();
+        }
+        return static_cast<T>(std::forward<U>(fallback));
+    }
+
     // clang-format off
     [[nodiscard]] auto value() -> T& { require_value(); return *ptr(); }
     [[nodiscard]] auto value() const -> const T& { require_value(); return *ptr(); }
