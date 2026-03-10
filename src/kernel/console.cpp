@@ -73,7 +73,6 @@ auto vprintf(const char* fmt, va_list& vargs) -> void
         {
             return;
         }
-
         ++fmt;
     }
 }

@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "common.hpp"
+#include <cstddef>
 
-auto operator new(usize size) -> void*;
-auto operator new[](usize size) -> void*;
+auto operator new(std::size_t size) -> void*;
+auto operator new[](std::size_t size) -> void*;
 auto operator delete(void* ptr) noexcept -> void;
 auto operator delete[](void* ptr) noexcept -> void;
-auto operator new(usize, void* ptr) noexcept -> void*;
+auto operator new(std::size_t, void* ptr) noexcept -> void*;

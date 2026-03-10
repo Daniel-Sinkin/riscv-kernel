@@ -2,7 +2,6 @@
 #include "kernel/cstring.hpp"
 
 #include "kernel/console.hpp"
-#include "lib/algorithm.hpp"
 
 namespace kernel
 {
@@ -102,12 +101,12 @@ auto strcmp(const char* s1, const char* s2) -> int
 auto strcmp(lib::Span<const char> s1, lib::Span<const char> s2) -> int
 {
     auto i = 0zu;
-    while (i < lib::max(s1.size(), s2.size()) && s1[i] == s2[i])
+    while (i < s1.size() && i < s2.size() && s1[i] == s2[i])
     {
         ++i;
     }
 
-    if (i < lib::max(s1.size(), s2.size()))
+    if (i < s1.size() && i < s2.size())
     {
         const auto lhs = static_cast<u8>(s1[i]);
         const auto rhs = static_cast<u8>(s2[i]);
@@ -126,3 +125,27 @@ auto strcmp(lib::Span<const char> s1, lib::Span<const char> s2) -> int
     return s1.size() < s2.size() ? -1 : 1;
 }
 }  // namespace kernel
+
+extern "C" auto memset(void* buf, int c, usize n) -> void*
+{
+    kernel::puts("Invoked global memset\n");
+    return kernel::memset(buf, static_cast<u8>(c), n);
+}
+
+extern "C" auto memcpy(void* dst, const void* src, usize n) -> void*
+{
+    kernel::puts("Invoked global memcpy\n");
+    return kernel::memcpy(dst, src, n);
+}
+
+extern "C" auto strcpy(char* dst, const char* src) -> char*
+{
+    kernel::puts("Invoked global strcpy\n");
+    return kernel::strcpy(dst, src);
+}
+
+extern "C" auto strcmp(const char* s1, const char* s2) -> int
+{
+    kernel::puts("Invoked global strcmp\n");
+    return kernel::strcmp(s1, s2);
+}

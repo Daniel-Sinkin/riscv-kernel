@@ -12,7 +12,12 @@ extern "C" [[noreturn]] auto kernel_main() -> void
     physical_memory::init();
     init_heap();
 
-    if (auto retcode = main(); retcode != 0)
+    static char arg0[] = "kernel";
+    static char arg1[] = "--demo";
+    static char* argv[] = {arg0, arg1, nullptr};
+    const auto argc = 2;
+
+    if (auto retcode = main(argc, argv); retcode != 0)
     {
         panicf("Got errorcode %d in main()", retcode);
     }

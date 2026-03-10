@@ -21,3 +21,11 @@ auto strcmp(const char* s1, const char* s2) -> int;
 auto strcmp(lib::Span<const char> s1, lib::Span<const char> s2) -> int;
 
 }  // namespace kernel
+
+extern "C"
+{
+auto memset(void* buf, int c, usize n) -> void*;
+auto memcpy(void* dst, const void* src, usize n) -> void*;
+auto strcpy(char* dst, const char* src) -> char*;
+auto strcmp(const char* s1, const char* s2) -> int;
+}
