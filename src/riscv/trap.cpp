@@ -105,8 +105,8 @@ auto write_named_text(const char* name, const char* value) -> void
 
 }  // namespace
 
-extern "C" void trap_handler(
-    u64 mcause, u64 mepc, u64 mtval, [[maybe_unused]] const riscv::TrapFrame* frame)
+extern "C" void
+trap_handler(u64 mcause, u64 mepc, u64 mtval, [[maybe_unused]] const riscv::TrapFrame* frame)
 {
     const auto is_interrupt = (mcause & k_trap_interrupt_bit) != 0;
     const auto cause_code = mcause & ~k_trap_interrupt_bit;

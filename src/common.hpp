@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include "kernel/runtime.hpp"
+
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
-
-#include "kernel/runtime.hpp"
 
 using u8 = std::uint8_t;
 using u16 = std::uint16_t;
@@ -19,7 +19,11 @@ using i32 = std::int32_t;
 using i64 = std::int64_t;
 
 using uptr = std::uintptr_t;
+using iptr = std::intptr_t;
 using usize = std::size_t;
+using isize = std::ptrdiff_t;
+
+using Byte = std::byte;
 
 constexpr auto operator""_KiB(unsigned long long value) -> usize
 {

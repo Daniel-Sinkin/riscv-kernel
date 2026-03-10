@@ -12,7 +12,7 @@ namespace kernel
 
 auto putc(char c) -> void;
 auto putc(u8 value) -> void;
-auto putc(std::byte value) -> void;
+auto putc(Byte value) -> void;
 auto puts(const char* c) -> void;
 auto putsln(const char* c) -> void;
 auto write(const char* c, usize n) -> void;

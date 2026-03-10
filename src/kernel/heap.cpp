@@ -78,7 +78,7 @@ bool g_initialized{};
 }
 
 template <typename T>
-[[nodiscard]] auto aligned_ptr(std::byte* ptr) -> T*
+[[nodiscard]] auto aligned_ptr(Byte* ptr) -> T*
 {
     return static_cast<T*>(__builtin_assume_aligned(ptr, alignof(T)));
 }
@@ -88,7 +88,7 @@ template <typename T>
     return aligned_ptr<PageHeader>(g_heap_page->data);
 }
 
-[[nodiscard]] auto page_bytes() -> std::byte*
+[[nodiscard]] auto page_bytes() -> Byte*
 {
     return g_heap_page->data;
 }
@@ -98,17 +98,17 @@ template <typename T>
     return aligned_ptr<BlockHeader>(page_bytes() + first_block_offset());
 }
 
-[[nodiscard]] auto block_payload(BlockHeader* block) -> std::byte*
+[[nodiscard]] auto block_payload(BlockHeader* block) -> Byte*
 {
-    return reinterpret_cast<std::byte*>(block) + sizeof(BlockHeader);
+    return reinterpret_cast<Byte*>(block) + sizeof(BlockHeader);
 }
 
-[[nodiscard]] auto block_end(BlockHeader* block) -> std::byte*
+[[nodiscard]] auto block_end(BlockHeader* block) -> Byte*
 {
     return block_payload(block) + block->size;
 }
 
-[[nodiscard]] auto page_end() -> std::byte*
+[[nodiscard]] auto page_end() -> Byte*
 {
     return page_bytes() + physical_memory::k_page_size;
 }
@@ -166,7 +166,7 @@ auto initialize_block(BlockHeader* block, u32 size, u32 prev_size, bool is_free)
             return false;
         }
 
-        auto* prev = aligned_ptr<BlockHeader>(reinterpret_cast<std::byte*>(prev_addr));
+        auto* prev = aligned_ptr<BlockHeader>(reinterpret_cast<Byte*>(prev_addr));
         if (!prev->has_valid_magic() || next_block(prev) != block)
         {
             return false;
@@ -194,7 +194,7 @@ auto initialize_block(BlockHeader* block, u32 size, u32 prev_size, bool is_free)
     }
 
     const auto prev_addr = reinterpret_cast<uptr>(block) - sizeof(BlockHeader) - block->prev_size;
-    return aligned_ptr<BlockHeader>(reinterpret_cast<std::byte*>(prev_addr));
+    return aligned_ptr<BlockHeader>(reinterpret_cast<Byte*>(prev_addr));
 }
 
 auto update_next_prev_size(BlockHeader* block) -> void
@@ -259,7 +259,7 @@ auto require_initialized() -> void
     }
 }
 
-[[nodiscard]] auto require_allocated_block_from_payload(std::byte* addr, const char* message)
+[[nodiscard]] auto require_allocated_block_from_payload(Byte* addr, const char* message)
     -> BlockHeader*
 {
     if (addr < page_bytes() + first_block_offset() + sizeof(BlockHeader) || addr >= page_end())
@@ -273,7 +273,7 @@ auto require_initialized() -> void
         panic(message);
     }
 
-    auto* block = aligned_ptr<BlockHeader>(reinterpret_cast<std::byte*>(block_addr));
+    auto* block = aligned_ptr<BlockHeader>(reinterpret_cast<Byte*>(block_addr));
     if (!is_valid_block(block) || block_payload(block) != addr)
     {
         panic(message);
@@ -295,7 +295,7 @@ auto init_heap() -> void
 
     for (auto& byte : g_heap_page->data)
     {
-        byte = std::byte{0};
+        byte = Byte{0};
     }
 
     auto* header = page_header();
@@ -368,7 +368,7 @@ auto realloc(void* ptr, usize n) -> void*
     const auto bh_size = static_cast<u32>(sizeof(BlockHeader));
     const auto aligned_n = align_up(static_cast<u32>(n), bh_align);
 
-    auto* addr = static_cast<std::byte*>(ptr);
+    auto* addr = static_cast<Byte*>(ptr);
     auto* block = require_allocated_block_from_payload(addr, "realloc invalid pointer");
     const auto old_size = block->size;
 
@@ -386,7 +386,7 @@ auto realloc(void* ptr, usize n) -> void*
             auto* split_start = block_payload(block) + aligned_n;
             for (auto* byte = split_start; byte < old_end; ++byte)
             {
-                *byte = std::byte{0};
+                *byte = Byte{0};
             }
 
             auto* split_block = aligned_ptr<BlockHeader>(split_start);
@@ -437,7 +437,7 @@ auto realloc(void* ptr, usize n) -> void*
         return ptr;
     }
 
-    auto* ptr_new = static_cast<std::byte*>(malloc(n));
+    auto* ptr_new = static_cast<Byte*>(malloc(n));
     if (!ptr_new)
     {
         return nullptr;
@@ -461,14 +461,14 @@ auto free(void* ptr) -> void
         return;
     }
 
-    auto* addr = static_cast<std::byte*>(ptr);
+    auto* addr = static_cast<Byte*>(ptr);
     auto* block = require_allocated_block_from_payload(addr, "free invalid pointer");
 
     block->mark_free();
 
     for (auto* byte = block_payload(block); byte < block_end(block); ++byte)
     {
-        *byte = std::byte{0};
+        *byte = Byte{0};
     }
 
     while (merge_with_next(block))

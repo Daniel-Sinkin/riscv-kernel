@@ -6,7 +6,7 @@
 
 extern "C"
 {
-    extern std::byte _kernel_end[];
+    extern Byte _kernel_end[];
 }
 
 namespace
@@ -91,10 +91,10 @@ class PhysicalPageAllocator
 
         bitmap_start_[byte_offset] &= ~bit_mask;
 
-        auto* page_bytes = reinterpret_cast<std::byte*>(addr);
+        auto* page_bytes = reinterpret_cast<Byte*>(addr);
         for (auto i = 0zu; i < kernel::physical_memory::k_page_size; ++i)
         {
-            page_bytes[i] = std::byte{0};
+            page_bytes[i] = Byte{0};
         }
     }
 

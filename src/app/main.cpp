@@ -1,9 +1,6 @@
 #include "common.hpp"
-#include "kernel/heap.hpp"
-#include "util.hpp"
-
-#include <kernel/console.hpp>
-#include <lib/vector.hpp>
+#include "kernel/console.hpp"
+#include "lib/optional.hpp"
 
 struct NonTrivial
 {
@@ -11,7 +8,11 @@ struct NonTrivial
     {
         kernel::printfn("NonTrivial() Constructor called");
     }
-    NonTrivial(u32 data) : data_{data}
+    template <typename T>
+        requires requires(T t) {
+            { static_cast<u32>(t) };
+        }
+    NonTrivial(T data) : data_{static_cast<u32>(data)}
     {
         kernel::printfn("NonTrivial(u32) Constructor called");
     }
@@ -31,13 +32,12 @@ struct NonTrivial
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    auto p = static_cast<NonTrivial*>(kernel::malloc(sizeof(NonTrivial)));
-    ScopeExit se{[&] { kernel::free(p); }};
-    if (!p)
-    {
-        kernel::panic("Failed to malloc()");
-    }
-    auto nptr = new (p) NonTrivial{5};
-    ScopeExit se2{[&] { nptr->~NonTrivial(); }};
+    lib::Optional<NonTrivial> o{std::in_place, 5};
+    lib::Optional<NonTrivial> copied{o};
+    lib::Optional<NonTrivial> moved{std::move(copied)};
+
+    kernel::printfn("%d", static_cast<int>(moved->data()));
+    kernel::printfn("%d", static_cast<int>(copied.has_value()));
+
     return 0;
 }

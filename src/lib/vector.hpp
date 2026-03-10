@@ -74,7 +74,7 @@ class Vector
     {
         if (idx >= size_)
         {
-            kernel::panic("Overflow on Vector at()");
+            kernel::panic("[Exception] Overflow on Vector at()");
         }
         return data_[idx];
     }
@@ -83,41 +83,29 @@ class Vector
     {
         if (idx >= size_)
         {
-            kernel::panic("Overflow on Vector at()");
+            kernel::panic("[Exception] Overflow on Vector at()");
         }
         return data_[idx];
     }
 
     auto front() -> T&
     {
-        if (empty())
-        {
-            kernel::panic("front on empty Vector");
-        }
+        require_not_empty("front");
         return data_[0];
     }
     auto front() const -> const T&
     {
-        if (empty())
-        {
-            kernel::panic("front on empty Vector");
-        }
+        require_not_empty("front");
         return data_[0];
     }
     auto back() -> T&
     {
-        if (empty())
-        {
-            kernel::panic("back on empty Vector");
-        }
+        require_not_empty("back");
         return data_[size_ - 1];
     }
     auto back() const -> const T&
     {
-        if (empty())
-        {
-            kernel::panic("back on empty Vector");
-        }
+        require_not_empty("back");
         return data_[size_ - 1];
     }
     // clang-format off
@@ -148,7 +136,7 @@ class Vector
 
     auto pop_back() -> void
     {
-        require_not_empty("pop_back on empty Vector");
+        require_not_empty("pop_back");
         --size_;
         data_[size_] = T{};
     }
@@ -279,11 +267,11 @@ class Vector
         return count * sizeof(T);
     }
 
-    auto require_not_empty(const char* message) const -> void
+    auto require_not_empty(const char* fn_name) const -> void
     {
         if (empty())
         {
-            kernel::panic(message);
+            kernel::panicf("'%s()' on empty vector", fn_name);
         }
     }
 

@@ -13,7 +13,7 @@ static_assert(k_page_size * k_default_num_pages == 128_MiB);
 
 struct alignas(8) Page
 {
-    std::byte data[k_page_size];
+    Byte data[k_page_size];
 };
 
 auto init(usize num_pages = k_default_num_pages) -> void;

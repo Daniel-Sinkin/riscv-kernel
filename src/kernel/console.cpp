@@ -109,7 +109,7 @@ auto putc(u8 value) -> void
     putc(static_cast<char>(value));
 }
 
-auto putc(std::byte value) -> void
+auto putc(Byte value) -> void
 {
     putc(std::to_integer<u8>(value));
 }
