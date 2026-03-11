@@ -3,7 +3,7 @@
 #pragma once
 
 #include "common.hpp"
-#include "qemu_virt/syscon.hpp"
+#include "qemu_virt/syscon.hpp"  // IWYU pragma: keep
 
 #include <concepts>
 #include <type_traits>
@@ -100,10 +100,11 @@ inline auto write_number(I x) -> void
 
 }  // namespace kernel
 
-#define PANIC(fmt, ...)                                                                            \
+#define PANIC(...)                                                                                 \
     do                                                                                             \
     {                                                                                              \
-        kernel::printf("PANIC: %s:%d:%s\n", __FILE__, __LINE__, (fmt), ##__VA_ARGS__);             \
+        kernel::printf("PANIC: %s:%d: ", __FILE__, __LINE__);                                      \
+        kernel::printfn(__VA_ARGS__);                                                              \
         while (true)                                                                               \
         {                                                                                          \
             qemu_virt::_panic();                                                                   \

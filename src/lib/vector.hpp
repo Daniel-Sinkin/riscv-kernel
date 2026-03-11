@@ -371,7 +371,7 @@ class Vector
     {
         if (empty())
         {
-            PANICf("'%s()' on empty vector", fn_name);
+            PANIC("%s on empty vector", fn_name);
         }
     }
 

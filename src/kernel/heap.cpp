@@ -5,6 +5,7 @@
 
 #include "kernel/console.hpp"
 #include "kernel/physical_page_allocator.hpp"
+#include "lib/vector.hpp"
 
 namespace kernel
 {
@@ -52,6 +53,7 @@ struct alignas(8) BlockHeader
 };
 
 physical_memory::Page* g_heap_page{};
+lib::Vector<physical_memory::Page*> g_heap_pages{};
 bool g_initialized{};
 
 [[maybe_unused]] [[nodiscard]] constexpr auto align_up(usize value, usize alignment) -> usize
@@ -251,11 +253,11 @@ auto merge_with_next(BlockHeader* block) -> bool
     return true;
 }
 
-auto require_initialized() -> void
+auto require_initialized(const char* fn_name) -> void
 {
     if (!g_initialized)
     {
-        PANIC("heap used before init");
+        PANIC("%s used before heap init", fn_name);
     }
 }
 
@@ -291,8 +293,8 @@ auto require_initialized() -> void
 
 auto init_heap() -> void
 {
-    g_heap_page = physical_memory::alloc_page();
-
+    g_heap_pages.push_back(physical_memory::alloc_page());
+    g_heap_page = g_heap_pages.front();
     for (auto& byte : g_heap_page->data)
     {
         byte = Byte{0};
@@ -309,7 +311,7 @@ auto init_heap() -> void
 
 auto malloc(usize n) -> void*
 {
-    require_initialized();
+    require_initialized("malloc");
 
     if (n == 0 || n > usable_block_bytes())
     {
@@ -348,7 +350,7 @@ auto malloc(usize n) -> void*
 
 auto realloc(void* ptr, usize n) -> void*
 {
-    require_initialized();
+    require_initialized("realloc");
     if (ptr == nullptr)
     {
         return malloc(n);
@@ -454,7 +456,7 @@ auto realloc(void* ptr, usize n) -> void*
 
 auto free(void* ptr) -> void
 {
-    require_initialized();
+    require_initialized("free");
 
     if (ptr == nullptr)
     {

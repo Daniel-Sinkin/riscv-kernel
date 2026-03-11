@@ -138,4 +138,12 @@ auto write(const char* c, usize n) -> void
     }
 }
 
+[[noreturn]] auto _panic() -> void
+{
+    while (true)
+    {
+        qemu_virt::syscon_poweroff();
+        asm volatile("wfi");
+    }
+}
 }  // namespace kernel
