@@ -7,7 +7,6 @@
 
 .section .text.init
 
-
 # Makes _start globally visible, b.c. of ENTRY(_start) this is the entry point
 .globl _start
 # Declares that _start is a function symbol

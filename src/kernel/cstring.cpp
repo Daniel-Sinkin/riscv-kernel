@@ -41,7 +41,7 @@ auto memcpy(lib::Span<u8> dst, lib::Span<const u8> src) -> void
 {
     if (dst.size() < src.size())
     {
-        kernel::panic("memcpy span destination is too small");
+        PANIC("memcpy span destination is too small");
     }
     for (auto i = 0zu; i < src.size(); ++i)
     {
@@ -68,7 +68,7 @@ auto strcpy(lib::Span<char> dst, lib::Span<const char> src) -> void
 {
     if (dst.size() < src.size())
     {
-        kernel::panic("strcpy span destination is too small");
+        PANIC("strcpy span destination is too small");
     }
 
     for (auto i = 0zu; i < src.size(); ++i)

@@ -13,5 +13,6 @@ constexpr u32 k_syscon_reboot{0x7777};
 
 auto syscon_poweroff() -> void;
 auto syscon_reboot() -> void;
+[[noreturn]] auto _panic() -> void;
 
 }  // namespace qemu_virt

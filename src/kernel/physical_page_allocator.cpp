@@ -56,7 +56,7 @@ class PhysicalPageAllocator
                 }
             }
         }
-        kernel::panic("No free page left");
+        PANIC("No free page left");
     }
 
     auto free_page(Page* page) -> void
@@ -71,12 +71,12 @@ class PhysicalPageAllocator
         const auto pages_end = pages_start_ + num_pages_ * kernel::physical_memory::k_page_size;
         if (addr < pages_start_ || addr >= pages_end)
         {
-            kernel::panic("free_page out of range");
+            PANIC("free_page out of range");
         }
 
         if ((addr - pages_start_) % kernel::physical_memory::k_page_size != 0)
         {
-            kernel::panic("free_page misaligned");
+            PANIC("free_page misaligned");
         }
 
         const auto page_index = (addr - pages_start_) / kernel::physical_memory::k_page_size;
@@ -86,7 +86,7 @@ class PhysicalPageAllocator
 
         if ((bitmap_start_[byte_offset] & bit_mask) == 0)
         {
-            kernel::panic("free_page on already free page");
+            PANIC("free_page on already free page");
         }
 
         bitmap_start_[byte_offset] &= ~bit_mask;
@@ -109,7 +109,7 @@ class PhysicalPageAllocator
     {
         if (!initialized_)
         {
-            kernel::panic(message);
+            PANIC(message);
         }
     }
 

@@ -58,7 +58,7 @@ class Vector
     {
         if (idx >= size_)
         {
-            kernel::panic("Overflow on Vector operator[]");
+            PANIC("Overflow on Vector operator[]");
         }
         return data_[idx];
     }
@@ -67,7 +67,7 @@ class Vector
     {
         if (idx >= size_)
         {
-            kernel::panic("Overflow on Vector operator[]");
+            PANIC("Overflow on Vector operator[]");
         }
         return data_[idx];
     }
@@ -76,7 +76,7 @@ class Vector
     {
         if (idx >= size_)
         {
-            kernel::panic("[Exception] Overflow on Vector at()");
+            PANIC("Overflow on Vector at()");
         }
         return data_[idx];
     }
@@ -85,7 +85,7 @@ class Vector
     {
         if (idx >= size_)
         {
-            kernel::panic("[Exception] Overflow on Vector at()");
+            PANIC("Overflow on Vector at()");
         }
         return data_[idx];
     }
@@ -274,7 +274,7 @@ class Vector
 
         if (capacity_ >= max_count())
         {
-            kernel::panic("Overflow on Vector capacity growth");
+            PANIC("Overflow on Vector capacity growth");
         }
 
         if (capacity_ > max_count() / 2)
@@ -289,7 +289,7 @@ class Vector
     {
         if (count > max_count())
         {
-            kernel::panic("Overflow on Vector allocation size");
+            PANIC("Overflow on Vector allocation size");
         }
         return count * sizeof(T);
     }
@@ -371,7 +371,7 @@ class Vector
     {
         if (empty())
         {
-            kernel::panicf("'%s()' on empty vector", fn_name);
+            PANICf("'%s()' on empty vector", fn_name);
         }
     }
 

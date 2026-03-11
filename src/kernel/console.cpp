@@ -138,29 +138,4 @@ auto write(const char* c, usize n) -> void
     }
 }
 
-[[noreturn]] auto _panic() -> void
-{
-    while (true)
-    {
-        qemu_virt::syscon_poweroff();
-        asm volatile("wfi");
-    }
-}
-
-[[noreturn]] auto panic(const char* msg) -> void
-{
-    putsln(msg);
-    _panic();
-}
-
-[[noreturn]] auto panicf(const char* fmt, ...) -> void
-{
-    va_list vargs;
-    va_start(vargs, fmt);
-    ScopeExit se{[&] { va_end(vargs); }};
-    vprintf(fmt, vargs);
-    va_end(vargs);
-    _panic();
-}
-
 }  // namespace kernel

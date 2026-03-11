@@ -3,6 +3,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "qemu_virt/syscon.hpp"
 
 #include <concepts>
 #include <type_traits>
@@ -18,8 +19,6 @@ auto putsln(const char* c) -> void;
 auto write(const char* c, usize n) -> void;
 auto printf(const char* fmt, ...) -> void;
 auto printfn(const char* fmt, ...) -> void;
-[[noreturn]] auto panic(const char* msg) -> void;
-[[noreturn]] auto panicf(const char* fmt, ...) -> void;
 
 template <std::unsigned_integral U>
 inline auto write_hex(U x) -> void
@@ -100,3 +99,13 @@ inline auto write_number(I x) -> void
 }
 
 }  // namespace kernel
+
+#define PANIC(fmt, ...)                                                                            \
+    do                                                                                             \
+    {                                                                                              \
+        kernel::printf("PANIC: %s:%d:%s\n", __FILE__, __LINE__, (fmt), ##__VA_ARGS__);             \
+        while (true)                                                                               \
+        {                                                                                          \
+            qemu_virt::_panic();                                                                   \
+        }                                                                                          \
+    } while (0)

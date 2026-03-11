@@ -117,7 +117,7 @@ class Optional
     {
         if (!has_value_)
         {
-            kernel::panic("Optional access without value");
+            PANIC("Optional access without value");
         }
     }
 

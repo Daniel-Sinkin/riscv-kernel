@@ -16,7 +16,7 @@ class Array
     {
         if (idx >= N)
         {
-            kernel::panic("[Exception]Overflow on Array operator[]");
+            PANIC("Overflow on Array operator[]");
         }
         return data_[idx];
     }
@@ -25,7 +25,7 @@ class Array
     {
         if (idx >= N)
         {
-            kernel::panic("[Exception]Overflow on Array operator[]");
+            PANIC("Overflow on Array operator[]");
         }
         return data_[idx];
     }
@@ -34,7 +34,7 @@ class Array
     {
         if (idx >= N)
         {
-            kernel::panic("Overflow on Array at()");
+            PANIC("Overflow on Array at()");
         }
         return data_[idx];
     }
@@ -43,7 +43,7 @@ class Array
     {
         if (idx >= N)
         {
-            kernel::panic("Overflow on Array at()");
+            PANIC("Overflow on Array at()");
         }
         return data_[idx];
     }

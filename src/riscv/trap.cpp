@@ -116,5 +116,5 @@ trap_handler(u64 mcause, u64 mepc, u64 mtval, [[maybe_unused]] const riscv::Trap
     write_named_text("cause", trap_cause_name(is_interrupt, cause_code));
     write_named_hex("mepc", mepc);
     write_named_hex("mtval", mtval);
-    kernel::panic("trap_handler panic");
+    PANIC("trap_handler panic");
 }

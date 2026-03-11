@@ -212,7 +212,7 @@ auto update_next_prev_size(BlockHeader* block) -> void
     {
         if (!is_valid_block(block))
         {
-            panic("heap metadata corruption");
+            PANIC("heap metadata corruption");
         }
 
         if (block->is_free())
@@ -238,7 +238,7 @@ auto merge_with_next(BlockHeader* block) -> bool
 
     if (!is_valid_block(next))
     {
-        panic("heap metadata corruption");
+        PANIC("heap metadata corruption");
     }
 
     if (!next->is_free())
@@ -255,7 +255,7 @@ auto require_initialized() -> void
 {
     if (!g_initialized)
     {
-        panic("heap used before init");
+        PANIC("heap used before init");
     }
 }
 
@@ -264,24 +264,24 @@ auto require_initialized() -> void
 {
     if (addr < page_bytes() + first_block_offset() + sizeof(BlockHeader) || addr >= page_end())
     {
-        panic(message);
+        PANIC(message);
     }
 
     const auto block_addr = reinterpret_cast<uptr>(addr - sizeof(BlockHeader));
     if ((block_addr % alignof(BlockHeader)) != 0)
     {
-        panic(message);
+        PANIC(message);
     }
 
     auto* block = aligned_ptr<BlockHeader>(reinterpret_cast<Byte*>(block_addr));
     if (!is_valid_block(block) || block_payload(block) != addr)
     {
-        panic(message);
+        PANIC(message);
     }
 
     if (block->is_free())
     {
-        panic("double free");
+        PANIC("double free");
     }
 
     return block;
@@ -403,7 +403,7 @@ auto realloc(void* ptr, usize n) -> void*
     {
         if (!is_valid_block(next))
         {
-            panic("heap metadata corruption");
+            PANIC("heap metadata corruption");
         }
 
         if (!next->is_free())

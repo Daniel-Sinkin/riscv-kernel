@@ -174,7 +174,7 @@ class Expected
     {
         if (!has_value())
         {
-            kernel::panic("Expected access without value");
+            PANIC("Expected access without value");
         }
     }
 
@@ -182,7 +182,7 @@ class Expected
     {
         if (!initialized_ || has_value_)
         {
-            kernel::panic("Expected access without error");
+            PANIC("Expected access without error");
         }
     }
 

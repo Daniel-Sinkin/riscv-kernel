@@ -17,4 +17,13 @@ auto syscon_reboot() -> void
     mmio_write(k_syscon_base, k_syscon_reboot);
 }
 
+[[noreturn]] auto _panic() -> void
+{
+    while (true)
+    {
+        syscon_poweroff();
+        asm volatile("wfi");
+    }
+}
+
 }  // namespace qemu_virt

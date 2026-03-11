@@ -19,9 +19,9 @@ extern "C" [[noreturn]] auto kernel_main() -> void
 
     if (auto retcode = main(argc, argv); retcode != 0)
     {
-        panicf("Got errorcode %d in main()", retcode);
+        PANIC("Got errorcode %d in main()", retcode);
     }
-    panic("Finished running normally");
+    PANIC("Finished running normally");
 
-    panic("Trying to exit kernel_main() illegally!");
+    PANIC("Trying to exit kernel_main() illegally!");
 }

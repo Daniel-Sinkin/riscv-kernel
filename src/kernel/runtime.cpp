@@ -10,7 +10,7 @@ auto operator new(usize size) -> void*
     auto* ptr = kernel::malloc(size);
     if (ptr == nullptr)
     {
-        kernel::panic("operator new allocation failed");
+        PANIC("operator new allocation failed");
     }
     return ptr;
 }
@@ -20,7 +20,7 @@ auto operator new[](usize size) -> void*
     auto* ptr = kernel::malloc(size);
     if (ptr == nullptr)
     {
-        kernel::panic("operator new[] allocation failed");
+        PANIC("operator new[] allocation failed");
     }
     return ptr;
 }
